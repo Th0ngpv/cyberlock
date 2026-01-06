@@ -1,24 +1,17 @@
 // FILE: public/multiplayer.js (UPDATED)
 
-// Firebase Configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDI0VjgYNTXcsjFlEZMs59m4_HQHOfTVPM",
-  authDomain: "cyberlock-157ae.firebaseapp.com",
-  databaseURL: "https://cyberlock-157ae-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "cyberlock-157ae",
-  storageBucket: "cyberlock-157ae.firebasestorage.app",
-  messagingSenderId: "1083834988196",
-  appId: "1:1083834988196:web:aef026a27debda11a7d831"
-};
-
 // Initialize Firebase
 let db;
-try {
+
+async function initFirebase() {
+  const res = await fetch('/api/firebase-config');
+  const firebaseConfig = await res.json();
+
   firebase.initializeApp(firebaseConfig);
   db = firebase.database();
-} catch (error) {
-  console.error("Firebase init error:", error);
 }
+
+initFirebase();
 
 // Multiplayer State
 let currentRoom = null;
