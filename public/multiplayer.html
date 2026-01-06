@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBERLOCK - MULTIPLAYER</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- TOP NAV BAR -->
+    <div class="nav-bar">
+      <button class="nav-tab" onclick="window.location.href='index.html'">
+        🎯 SINGLE
+      </button>
+      <button class="nav-tab active">
+        🎮 MULTIPLAYER
+      </button>
+    </div>
+
+    <!-- Welcome Screen - Category Selection -->
+    <div id="welcomeScreen" class="screen">
+      <div class="welcome-content pixel-border">
+        <h1>▓▓ MULTIPLAYER QUIZ ▓▓</h1>
+        <p>SELECT YOUR TOPICS</p>
+        
+        <div class="progress-bar-categories">
+          <div class="progress-fill-categories" id="categoryProgressFill"></div>
+        </div>
+        <div class="category-progress-text" id="categoryProgressText">0 / 0 CATEGORIES COMPLETED</div>
+        
+        <div class="categories" id="categoriesContainer"></div>
+      </div>
+      
+      <div class="category-actions">
+        <button class="btn-action" id="clearSelectionBtn">CLEAR</button>
+        <button class="btn-action btn-primary" id="continueBtn" disabled>CONTINUE →</button>
+      </div>
+    </div>
+
+    <!-- Mode Selection Screen -->
+    <div id="modeScreen" class="screen active">
+      <div class="mode-content">
+        <h2>MULTIPLAYER MODE</h2>
+        <div class="mode-buttons">
+          <button class="mode-btn multiplayer-mode" id="createRoomBtn">
+            <span class="mode-icon">🎮</span>
+            <span class="mode-title">CREATE ROOM</span>
+            <span class="mode-desc">Host Game</span>
+          </button>
+          <button class="mode-btn multiplayer-mode" id="joinRoomBtn">
+            <span class="mode-icon">🚪</span>
+            <span class="mode-title">JOIN ROOM</span>
+            <span class="mode-desc">Enter Code</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multiplayer Lobby Screen -->
+    <div id="multiplayerLobbyScreen" class="screen">
+      <div class="mp-lobby-content">
+        <h2>🎮 MULTIPLAYER LOBBY</h2>
+        
+        <div class="mp-room-code-display">
+          <p>ROOM CODE:</p>
+          <h1 id="mpRoomCode">------</h1>
+          <p class="mp-code-hint">Share this code with players!</p>
+        </div>
+        
+        <div class="mp-players-section">
+          <h3>PLAYERS IN LOBBY:</h3>
+          <div class="mp-players-list" id="mpPlayersList"></div>
+        </div>
+        
+        <div id="mpHostControls" style="display: none;">
+          <button class="btn-action btn-primary" id="mpStartGameBtn">START GAME →</button>
+        </div>
+        
+        <button class="btn-back" id="backFromMpLobby">← LEAVE</button>
+      </div>
+    </div>
+
+    <!-- Multiplayer Game Screen -->
+    <div id="multiplayerGameScreen" class="screen">
+      <div class="mp-game-content">
+        <div class="progress-bar">
+          <div class="progress-fill" id="mpProgressFill"></div>
+        </div>
+        <div class="question-counter" id="mpQuestionCounter"></div>
+        
+        <div class="question-card">
+          <h2 id="mpQuestionText"></h2>
+          <div class="options" id="mpOptionsContainer"></div>
+          
+          <div id="mpWaitingMessage" class="mp-waiting" style="display: none;">
+            <p>⏳ WAITING FOR OTHER PLAYERS...</p>
+          </div>
+        </div>
+        
+        <div id="mpHostControls">
+          <button class="btn-action btn-primary" id="mpShowResultsBtn" style="display: none;">
+            SHOW RESULTS →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Multiplayer Question Results Screen -->
+    <div id="multiplayerResultsScreen" class="screen">
+      <div class="mp-results-content">
+        <h2>📊 QUESTION RESULTS</h2>
+        
+        <div class="mp-correct-answer" id="mpCorrectAnswer"></div>
+        
+        <div class="mp-results-list" id="mpQuestionResultsList"></div>
+        
+        <button class="btn-action btn-primary" id="mpNextQuestionHostBtn" style="display: none;">
+          NEXT QUESTION →
+        </button>
+      </div>
+    </div>
+
+    <!-- Multiplayer Final Results Screen -->
+    <div id="multiplayerFinalScreen" class="screen">
+      <div class="mp-final-content">
+        <h2>🏆 FINAL RESULTS</h2>
+        
+        <div class="mp-final-list" id="mpFinalResultsList"></div>
+        
+        <button class="btn-back" id="mpBackToLobby">← BACK TO MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="live.js"></script>
+  <script src="multiplayer.js"></script>
+</body>
+</html>

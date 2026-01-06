@@ -1,0 +1,26 @@
+{
+  "name": "cyberlock",
+  "version": "1.0.0",
+  "description": "A retro pixel-styled quiz application with single-player and multiplayer modes.",
+  "homepage": "https://github.com/Fearel/cyberlock#readme",
+  "bugs": {
+    "url": "https://github.com/Fearel/cyberlock/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fearel/cyberlock.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongodb": "^7.0.0"
+  }
+}
