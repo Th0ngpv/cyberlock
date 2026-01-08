@@ -1,0 +1,194 @@
+<!-- FILE: public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBERLOCK - LESSONS</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <!-- TOP NAV BAR -->
+    <div class="nav-bar">
+      <button class="nav-tab" onclick="window.location.href='index.html'">      
+        🏠 HomePage
+      </button>
+      <button class="nav-tab active">
+        🎯 SINGLE
+      </button>
+      <button class="nav-tab " onclick="window.location.href='multiplayer.html'">
+        🎮 MULTIPLAYER
+      </button>
+    </div>
+    
+    <!-- Welcome Screen -->
+    <div id="welcomeScreen" class="screen active">
+      <div class="welcome-content drop-shadow">
+        <h1>▓▓ PIXEL QUIZ ▓▓</h1>
+        <p>SELECT YOUR TOPICS</p>
+        
+        <!-- Leaderboard Section -->
+        <div class="leaderboard-section">
+          <h3>🏆 LEADERBOARD 🏆</h3>
+          <div class="leaderboard-list" id="leaderboardList">
+            <div class="leaderboard-item">Loading...</div>
+          </div>
+        </div>
+        
+        <div class="progress-bar-categories">
+          <div class="progress-fill-categories" id="categoryProgressFill"></div>
+        </div>
+        <div class="category-progress-text" id="categoryProgressText">0 / 0 CATEGORIES COMPLETED</div>
+        
+        <div class="categories" id="categoriesContainer"></div>
+      </div>
+      
+      <div class="category-actions">
+        <button class="btn-action" id="clearSelectionBtn">CLEAR</button>
+        <button class="btn-action btn-primary" id="continueBtn" disabled>CONTINUE →</button>
+      </div>
+    </div>
+
+    <!-- Mode Selection Screen -->
+    <div id="modeScreen" class="screen">
+      <div class="mode-content">
+        <h2>CHOOSE MODE</h2>
+        <div class="selected-categories" id="selectedCategoriesDisplay"></div>
+        <div class="mode-buttons">
+          <button class="mode-btn quiz-mode" id="quizModeBtn">
+            <span class="mode-icon">❓</span>
+            <span class="mode-title">QUIZ</span>
+            <span class="mode-desc">Multiple Choice</span>
+            <span class="mode-status" id="quizStatus"></span>
+          </button>
+          <button class="mode-btn flashcard-mode" id="flashcardModeBtn">
+            <span class="mode-icon">🎴</span>
+            <span class="mode-title">CARDS</span>
+            <span class="mode-desc">Q & A</span>
+            <span class="mode-status" id="cardsStatus"></span>
+          </button>
+          <button class="mode-btn test-mode" id="testModeBtn">
+            <span class="mode-icon">📝</span>
+            <span class="mode-title">TEST</span>
+            <span class="mode-desc">Full Assessment</span>
+            <span class="mode-status" id="testStatus"></span>
+          </button>
+        </div>
+        <button class="btn-back" id="backFromModeBtn">← BACK</button>
+      </div>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quizScreen" class="screen">
+      <div class="quiz-content">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="question-counter" id="questionCounter"></div>
+        
+        <div class="question-card">
+          <h2 id="questionText"></h2>
+          <div class="options" id="optionsContainer"></div>
+          
+          <div id="feedbackContainer" class="feedback-hidden">
+            <div class="feedback-content">
+              <div class="feedback-result" id="feedbackResult"></div>
+              <div class="feedback-explanation" id="feedbackExplanation"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="navigation">
+          <button class="btn-nav" id="prevBtnQuiz" disabled>← PREV</button>
+          <button class="btn-nav btn-next" id="nextBtnQuiz" disabled>NEXT →</button>
+        </div>
+        <button class="btn-back" id="backFromQuizBtn">← EXIT</button>
+      </div>
+    </div>
+
+    <!-- Flashcard Screen -->
+    <div id="flashcardScreen" class="screen">
+      <div class="flashcard-content">
+        <div class="progress-bar">
+          <div class="progress-fill" id="flashcardProgressFill"></div>
+        </div>
+        <div class="question-counter" id="flashcardCounter"></div>
+        
+        <div class="flashcard-wrapper">
+          <div class="flashcard" id="flashcard">
+            <div class="flashcard-face flashcard-front">
+              <h3>QUESTION</h3>
+              <p id="flashcardQuestion"></p>
+              <p class="flip-hint">[ CLICK TO FLIP ]</p>
+            </div>
+            <div class="flashcard-face flashcard-back">
+              <h3>ANSWER</h3>
+              <p id="flashcardAnswer"></p>
+              <p class="flip-hint">[ CLICK TO FLIP ]</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="navigation">
+          <button class="btn-nav" id="prevBtnFlashcard" disabled>← PREV</button>
+          <button class="btn-nav btn-next" id="nextBtnFlashcard" disabled>NEXT →</button>
+        </div>
+        <button class="btn-back" id="backFromFlashcardBtn">← EXIT</button>
+      </div>
+    </div>
+
+    <!-- Test Mode Screen -->
+    <div id="testScreen" class="screen">
+      <div class="test-content">
+        <div class="progress-bar">
+          <div class="progress-fill" id="testProgressFill"></div>
+        </div>
+        <div class="question-counter" id="testCounter"></div>
+        
+        <div class="question-card">
+          <h2 id="testQuestionText"></h2>
+          
+          <!-- Multiple Choice Options -->
+          <div class="options" id="testOptionsContainer"></div>
+          
+          <!-- Matching Container -->
+          <div id="testMatchContainer" class="test-match-container"></div>
+          
+          <!-- Short Answer Container -->
+          <div id="testShortAnswerContainer" class="test-short-answer-container">
+            <input type="text" id="testShortAnswer" placeholder="TYPE YOUR ANSWER HERE">
+          </div>
+        </div>
+
+        <div class="navigation">
+          <button class="btn-nav" id="prevBtnTest" disabled>← PREV</button>
+          <button class="btn-nav btn-next" id="nextBtnTest">NEXT →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Results Screen -->
+    <div id="testResultsScreen" class="screen">
+      <div class="test-results-content">
+        <h2>TEST RESULTS</h2>
+        <div class="results-score" id="testResultsScore"></div>
+        
+        <!-- Username Input for Leaderboard -->
+        <div class="username-input-section" id="usernameSection">
+          <p class="username-prompt">ENTER YOUR NAME FOR LEADERBOARD:</p>
+          <input type="text" id="usernameInput" maxlength="20" placeholder="YOUR NAME">
+          <button class="btn-action btn-primary" id="submitScoreBtn">SUBMIT SCORE</button>
+        </div>
+        
+        <div class="results-summary" id="testResultsSummary"></div>
+        <button class="btn-back" id="backFromResultsBtn">← BACK TO CATEGORIES</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

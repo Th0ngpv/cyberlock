@@ -1,191 +1,316 @@
-<!-- FILE: public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYBERLOCK</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-</head>
-<body>
-  <div class="container">
-    <!-- TOP NAV BAR -->
-    <div class="nav-bar">
-      <button class="nav-tab">
-        🎯 SINGLE
-      </button>
-      <button class="nav-tab active" onclick="window.location.href='multiplayer.html'">
-        🎮 MULTIPLAYER
-      </button>
-    </div>
-    
-    <!-- Welcome Screen -->
-    <div id="welcomeScreen" class="screen active">
-      <div class="welcome-content pixel-border">
-        <h1>▓▓ PIXEL QUIZ ▓▓</h1>
-        <p>SELECT YOUR TOPICS</p>
-        
-        <!-- Leaderboard Section -->
-        <div class="leaderboard-section">
-          <h3>🏆 LEADERBOARD 🏆</h3>
-          <div class="leaderboard-list" id="leaderboardList">
-            <div class="leaderboard-item">Loading...</div>
-          </div>
-        </div>
-        
-        <div class="progress-bar-categories">
-          <div class="progress-fill-categories" id="categoryProgressFill"></div>
-        </div>
-        <div class="category-progress-text" id="categoryProgressText">0 / 0 CATEGORIES COMPLETED</div>
-        
-        <div class="categories" id="categoriesContainer"></div>
-      </div>
-      
-      <div class="category-actions">
-        <button class="btn-action" id="clearSelectionBtn">CLEAR</button>
-        <button class="btn-action btn-primary" id="continueBtn" disabled>CONTINUE →</button>
-      </div>
-    </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CYBERLOCK</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <style>
+    .welcome-content p {
+      margin-bottom: 0;
+    }
+    .two-side-section {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      margin-top: 30px;
+      padding: 20px;
+      p {
+        line-height: 1.5;
+      }
+    }
 
-    <!-- Mode Selection Screen -->
-    <div id="modeScreen" class="screen">
-      <div class="mode-content">
-        <h2>CHOOSE MODE</h2>
-        <div class="selected-categories" id="selectedCategoriesDisplay"></div>
-        <div class="mode-buttons">
-          <button class="mode-btn quiz-mode" id="quizModeBtn">
-            <span class="mode-icon">❓</span>
-            <span class="mode-title">QUIZ</span>
-            <span class="mode-desc">Multiple Choice</span>
-            <span class="mode-status" id="quizStatus"></span>
+    /* Left & Right sides */
+    .left-side,
+    .right-side {
+      flex: 1; /* 50% each */
+      padding: 20px;
+      color: #000;
+      border: 3px solid #000;
+      background: #ffffff;
+    }
+
+    /* Headings */
+    .left-side h2,
+    .right-side h2 {
+      margin-bottom: 10px;
+      color: #38bdf8;
+    }
+
+    /* Button */
+    .start-btn {
+      margin-top: 15px;
+      padding: 10px 16px;
+      background: #22c55e;
+      border: 3px solid #000;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: inherit;
+    }
+
+    .start-btn:hover {
+      background: #16a34a;
+    }
+    li {
+      list-style-type: none;
+    }
+
+    .learning-path {
+      margin-top: 40px;
+      padding: 25px;
+      color: #000;
+      border: 3px solid #000;
+      background: #ffffff;
+      text-align: center;
+      p {
+        font-size: 12px;
+      }
+      h3 {
+        font-size: medium;
+        margin-bottom: 1rem;
+        margin-top: 0.5rem;
+      }
+    }
+
+    .learning-path h2 {
+      color: #25cdeb;
+      margin-bottom: 1rem;
+    }
+
+    .path-desc {
+      font-size: 0.9rem;
+      margin-bottom: 25px;
+      color: #94a3b8;
+    }
+
+    /* Steps container */
+    .path-steps {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    /* Individual step */
+    .path-step {
+      width: 30%;
+      padding: 18px;
+      background: #ffffff;
+      border: 4px solid #000000;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Level label */
+    .level {
+      font-size: 0.75rem;
+      color: #38bdf8;
+      letter-spacing: 1px;
+    }
+
+    /* Active level */
+    .path-step.active {
+      border-color: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    }
+
+    /* Locked levels */
+    .path-step.locked {
+      opacity: 0.75;
+      filter: grayscale(100%);
+    }
+
+    /* Hover effect */
+    .path-step:hover {
+      transform: translateY(-6px);
+    }
+
+    /* ===== Team Section ===== */
+    .team-section {
+      margin-top: 40px;
+      padding: 25px;
+      color: #000;
+      border: 3px solid #000;
+      background: #ffffff;
+      text-align: center;
+    }
+
+    .team-section h2 {
+      color: #25cdeb;
+      margin-bottom: 0.75rem;
+    }
+
+    .team-desc {
+      font-size: 12px;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    /* Grid instead of steps */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    /* Person card */
+    .team-card {
+      padding: 16px;
+      border: 4px solid #000;
+      background: #ffffff;
+    }
+
+    .team-card h3 {
+      font-size: medium;
+      margin-bottom: 0.25rem;
+    }
+
+    .student-id {
+      font-size: 12px;
+      color: #555;
+    }
+
+    /* Footer */
+    .team-footer {
+      margin-top: 1.25rem;
+      font-size: 11px;
+      color: #444;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .two-side-section {
+        flex-direction: column;
+      }
+      .path-steps {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        .path-step {
+          width: 100%;
+        }
+        p {
+          display: none;
+        }
+      }
+
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <body>
+    <div class="container">
+      <!-- TOP NAV BAR -->
+      <div class="nav-bar">
+        <button class="nav-tab active">🏠 HomePage</button>
+        <button class="nav-tab" onclick="window.location.href='lessons.html'">
+          🎯 SINGLE
+        </button>
+        <button
+          class="nav-tab"
+          onclick="window.location.href='multiplayer.html'"
+        >
+          🎮 MULTIPLAYER
+        </button>
+      </div>
+
+      <!-- Welcome Screen -->
+      <div class="welcome-content drop-shadow">
+        <h1>▓▓ CYBERLOCK ▓▓</h1>
+        <p>Improve your cyber awareness</p>
+      </div>
+
+      <!-- Two Side Section -->
+      <div class="two-side-section">
+        <div class="left-side drop-shadow">
+          <h2>🛡️Learn Cybersecurity</h2>
+          <p>
+            Understand real-world cyber threats, phishing attacks, and how
+            hackers exploit weak systems.
+          </p>
+          <br />
+          <ul>
+            <li>✔ Network Basics</li>
+            <li>✔ Web Security</li>
+            <li>✔ Real Attack</li>
+          </ul>
+        </div>
+
+        <div class="right-side drop-shadow">
+          <h2>🎮Interactive Mode</h2>
+          <p>
+            Practice your skills through interactive simulations and multiplayer
+            challenges.
+          </p>
+          <button
+            class="start-btn drop-shadow"
+            onclick="window.location.href='lessons.html'"
+          >
+            ▶ Start Learning
           </button>
-          <button class="mode-btn flashcard-mode" id="flashcardModeBtn">
-            <span class="mode-icon">🎴</span>
-            <span class="mode-title">CARDS</span>
-            <span class="mode-desc">Q & A</span>
-            <span class="mode-status" id="cardsStatus"></span>
-          </button>
-          <button class="mode-btn test-mode" id="testModeBtn">
-            <span class="mode-icon">📝</span>
-            <span class="mode-title">TEST</span>
-            <span class="mode-desc">Full Assessment</span>
-            <span class="mode-status" id="testStatus"></span>
-          </button>
         </div>
-        <button class="btn-back" id="backFromModeBtn">← BACK</button>
       </div>
-    </div>
 
-    <!-- Quiz Screen -->
-    <div id="quizScreen" class="screen">
-      <div class="quiz-content">
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill"></div>
+      <!-- Learning Path -->
+      <div class="learning-path pixel-border">
+        <h2>📚 Learning Path</h2>
+        <p class="path-desc">
+          Progress through structured levels to master cybersecurity
+          fundamentals.
+        </p>
+
+        <div class="path-steps">
+          <div class="path-step active">
+            <span class="level">LEVEL 1</span>
+            <h3>Cyber Basics</h3>
+            <p>Password_Security, phishing</p>
+          </div>
+
+          <div class="path-step locked">
+            <span class="level">LEVEL 2</span>
+            <h3>Network Security</h3>
+            <p>Network_Security, Malware</p>
+          </div>
+
+          <div class="path-step locked">
+            <span class="level">LEVEL 3</span>
+            <h3>Web & System Defense</h3>
+            <p>Authentication Social_Engineering</p>
+          </div>
         </div>
-        <div class="question-counter" id="questionCounter"></div>
-        
-        <div class="question-card">
-          <h2 id="questionText"></h2>
-          <div class="options" id="optionsContainer"></div>
-          
-          <div id="feedbackContainer" class="feedback-hidden">
-            <div class="feedback-content">
-              <div class="feedback-result" id="feedbackResult"></div>
-              <div class="feedback-explanation" id="feedbackExplanation"></div>
-            </div>
+      </div>
+
+      <!-- Team Credits -->
+      <div class="team-section pixel-border">
+        <h2>👥 Project Team</h2>
+        <p class="team-desc">
+          CYBERLOCK is developed as a collaborative academic project.
+        </p>
+
+        <div class="team-grid">
+          <div class="team-card drop-shadow">
+            <h3>Lam Quang Nhat</h3>
+            <p class="student-id">S3980424</p>
+          </div>
+
+          <div class="team-card drop-shadow">
+            <h3>Ramussen Kirk August</h3>
+            <p class="student-id">S4202970</p>
+          </div>
+
+          <div class="team-card drop-shadow">
+            <h3>Pham Viet Thong</h3>
+            <p class="student-id">S4046025</p>
+          </div>
+
+          <div class="team-card drop-shadow">
+            <h3>Pham Gia Nguyen Khang</h3>
+            <p class="student-id">S4043907</p>
           </div>
         </div>
 
-        <div class="navigation">
-          <button class="btn-nav" id="prevBtnQuiz" disabled>← PREV</button>
-          <button class="btn-nav btn-next" id="nextBtnQuiz" disabled>NEXT →</button>
-        </div>
-        <button class="btn-back" id="backFromQuizBtn">← EXIT</button>
+        <p class="team-footer">RMIT University — Cybersecurity Project</p>
       </div>
     </div>
-
-    <!-- Flashcard Screen -->
-    <div id="flashcardScreen" class="screen">
-      <div class="flashcard-content">
-        <div class="progress-bar">
-          <div class="progress-fill" id="flashcardProgressFill"></div>
-        </div>
-        <div class="question-counter" id="flashcardCounter"></div>
-        
-        <div class="flashcard-wrapper">
-          <div class="flashcard" id="flashcard">
-            <div class="flashcard-face flashcard-front">
-              <h3>QUESTION</h3>
-              <p id="flashcardQuestion"></p>
-              <p class="flip-hint">[ CLICK TO FLIP ]</p>
-            </div>
-            <div class="flashcard-face flashcard-back">
-              <h3>ANSWER</h3>
-              <p id="flashcardAnswer"></p>
-              <p class="flip-hint">[ CLICK TO FLIP ]</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="navigation">
-          <button class="btn-nav" id="prevBtnFlashcard" disabled>← PREV</button>
-          <button class="btn-nav btn-next" id="nextBtnFlashcard" disabled>NEXT →</button>
-        </div>
-        <button class="btn-back" id="backFromFlashcardBtn">← EXIT</button>
-      </div>
-    </div>
-
-    <!-- Test Mode Screen -->
-    <div id="testScreen" class="screen">
-      <div class="test-content">
-        <div class="progress-bar">
-          <div class="progress-fill" id="testProgressFill"></div>
-        </div>
-        <div class="question-counter" id="testCounter"></div>
-        
-        <div class="question-card">
-          <h2 id="testQuestionText"></h2>
-          
-          <!-- Multiple Choice Options -->
-          <div class="options" id="testOptionsContainer"></div>
-          
-          <!-- Matching Container -->
-          <div id="testMatchContainer" class="test-match-container"></div>
-          
-          <!-- Short Answer Container -->
-          <div id="testShortAnswerContainer" class="test-short-answer-container">
-            <input type="text" id="testShortAnswer" placeholder="TYPE YOUR ANSWER HERE">
-          </div>
-        </div>
-
-        <div class="navigation">
-          <button class="btn-nav" id="prevBtnTest" disabled>← PREV</button>
-          <button class="btn-nav btn-next" id="nextBtnTest">NEXT →</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Test Results Screen -->
-    <div id="testResultsScreen" class="screen">
-      <div class="test-results-content">
-        <h2>TEST RESULTS</h2>
-        <div class="results-score" id="testResultsScore"></div>
-        
-        <!-- Username Input for Leaderboard -->
-        <div class="username-input-section" id="usernameSection">
-          <p class="username-prompt">ENTER YOUR NAME FOR LEADERBOARD:</p>
-          <input type="text" id="usernameInput" maxlength="20" placeholder="YOUR NAME">
-          <button class="btn-action btn-primary" id="submitScoreBtn">SUBMIT SCORE</button>
-        </div>
-        
-        <div class="results-summary" id="testResultsSummary"></div>
-        <button class="btn-back" id="backFromResultsBtn">← BACK TO CATEGORIES</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
-</body>
+  </body>
 </html>
