@@ -1,85 +1,93 @@
-document.addEventListener('DOMContentLoaded', loadDashboard);
+document.addEventListener("DOMContentLoaded", loadDashboard);
 
 async function loadDashboard() {
   try {
-    const res = await fetch('/api/dashboard');
+    const res = await fetch("/api/dashboard");
 
     if (!res.ok) {
-      location.href = '/login.html';
+      location.href = "/login.html";
       return;
     }
 
     const data = await res.json();
 
     // User info
-    document.getElementById('username').textContent = data.user.username;
-    document.getElementById('email').textContent = data.user.email;
-    document.getElementById('joined').textContent =
-      new Date(data.user.joined).toLocaleDateString();
+    document.getElementById("username").textContent = data.user.username;
+    document.getElementById("email").textContent = data.user.email;
+    document.getElementById("joined").textContent = new Date(
+      data.user.joined
+    ).toLocaleDateString();
 
-    // Overall progress
-    document.getElementById('overallProgress').style.width =
-      data.stats.percentage + '%';
-    document.getElementById('overallText').textContent =
-      `${data.stats.completedCategories} / ${data.stats.totalCategories} categories completed (${data.stats.percentage}%)`;
+    // Categories & progress
+    const categoryPercentages = renderCategories(data.progress);
 
-    // Categories
-    renderCategories(data.progress);
+    // Overall progress calculation based on test scores
+    const totalCategories = categoryPercentages.length;
+    const overallPercent = totalCategories
+      ? Math.round(categoryPercentages.reduce((a, b) => a + b, 0) / totalCategories)
+      : 0;
+
+    document.getElementById("overallProgress").style.width = overallPercent + "%";
+    document.getElementById("overallText").textContent =
+      `Overall Test Completion: ${overallPercent}%`;
+
   } catch (err) {
-    console.error('Dashboard load failed', err);
+    console.error("Dashboard load failed", err);
   }
 }
-document.addEventListener('DOMContentLoaded', () => {
-  const logoutBtn = document.getElementById('logoutBtn');
+
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("logoutBtn");
   if (!logoutBtn) return;
 
-  logoutBtn.addEventListener('click', async () => {
+  logoutBtn.addEventListener("click", async () => {
     try {
-      const res = await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      const res = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
       const data = await res.json();
 
       if (res.ok) {
-        alert('Logged out successfully!');
-        window.location.href = '/login.html';
+        alert("Logged out successfully!");
+        window.location.href = "/login.html";
       } else {
-        alert('Logout failed: ' + data.message);
+        alert("Logout failed: " + data.message);
       }
     } catch (err) {
-      console.error('Logout error:', err);
-      alert('Logout failed');
+      console.error("Logout error:", err);
+      alert("Logout failed");
     }
   });
 });
 
-
 function renderCategories(categories) {
-  const container = document.getElementById('categoryList');
-  container.innerHTML = '';
+  const container = document.getElementById("categoryList");
+  container.innerHTML = "";
+
+  const percentages = [];
 
   Object.entries(categories).forEach(([name, prog]) => {
-    const percent = calcCategoryPercent(prog);
+    const percent = calcCategoryPercent(prog); // only test score
+    percentages.push(percent);
 
-    const card = document.createElement('div');
-    card.className = 'category-card';
+    const card = document.createElement("div");
+    card.className = "category-card";
 
     card.innerHTML = `
-      <h3>${name.replace('_', ' ').toUpperCase()}</h3>
+      <h3>${name.replace("_", " ").toUpperCase()}</h3>
 
-      <p class="status ${prog.quiz ? 'done' : 'pending'}">
-        ${prog.quiz ? '✔' : '✖'} QUIZ
+      <p class="status ${prog.quiz ? "done" : "pending"}">
+        ${prog.quiz ? "✔" : "✖"} QUIZ
       </p>
 
-      <p class="status ${prog.cards ? 'done' : 'pending'}">
-        ${prog.cards ? '✔' : '✖'} CARDS
+      <p class="status ${prog.cards ? "done" : "pending"}">
+        ${prog.cards ? "✔" : "✖"} CARDS
       </p>
 
-      <p class="status ${prog.test ? 'done' : 'pending'}">
-        ${prog.test ? '✔' : '✖'} TEST
-        ${
-          prog.test
-            ? `(${prog.testScore} / ${prog.testMaxScore})`
-            : '(0 / 10)'
-        }
+      <p class="status ${prog.test ? "done" : "pending"}">
+        ${prog.test ? "✔" : "✖"} TEST
+        ${prog.test ? `(${prog.testScore} / ${prog.testMaxScore})` : "(0 / 10)"}
       </p>
 
       <div class="progress-bar">
@@ -91,14 +99,13 @@ function renderCategories(categories) {
 
     container.appendChild(card);
   });
+
+  return percentages; // for overall calculation
 }
 
-
 function calcCategoryPercent(p) {
-  let total = 3;
-  let done = 0;
-  if (p.quiz) done++;
-  if (p.cards) done++;
-  if (p.test) done++;
-  return Math.round((done / total) * 100);
+  if (p.test && typeof p.testScore === "number" && typeof p.testMaxScore === "number" && p.testMaxScore > 0) {
+    return Math.round((p.testScore / p.testMaxScore) * 100);
+  }
+  return 0;
 }
