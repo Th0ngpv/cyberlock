@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CYBERLOCK — Phishing Simulation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    .stage {
+      border: 3px solid #000;
+      background: #fff;
+      padding: 25px;
+      margin-top: 30px;
+      color: black;
+      line-height: 25px;
+
+      h2 {
+        margin-bottom: 15px;
+      }
+    }
+
+    .hidden { display: none; }
+
+    .email-list {
+      border: 3px solid #000;
+    }
+
+    .email-row {
+      padding: 14px;
+      border-bottom: 2px solid #000;
+      cursor: pointer;
+    }
+
+    .email-row:hover {
+      background: #f1f5f9;
+    }
+
+    .email-box {
+      border: 3px solid #000;
+      padding: 16px;
+      background: #fff;
+      margin-top: 15px;
+      font-size: 14px;
+
+    }
+
+    .malicious-link {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: #ef4444;
+      color: #fff;
+      border: 3px solid #000;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .progress-bar {
+      height: 14px;
+      border: 3px solid #000;
+      background: #e5e7eb;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #ef4444;
+      transition: width 0.3s ease;
+    }
+
+    .quiz-actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      border: 3px solid #000;
+      padding: 10px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .red { background: #ef4444; color: #fff; }
+    .green { background: #22c55e; color: #fff; }
+    .blue { background: #3b82f6; color: #fff; }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <!-- NAV -->
+  <div class="nav-bar">
+    <button class="nav-tab" onclick="location.href='index.html'">🏠 Home</button>
+    <button class="nav-tab active">📧 Phishing Simulation</button>
+    <button class="nav-tab" onclick="window.location.href='lessons.html'">🎯 SINGLE</button>
+    <button class="nav-tab" onclick="window.location.href='multiplayer.html'">🎮 MULTIPLAYER</button>
+  </div>
+
+  <!-- TITLE -->
+  <div class="welcome-content drop-shadow">
+    <h1>▓▓ CYBERLOCK ▓▓</h1>
+    <p>Email Phishing Awareness Training</p>
+  </div>
+
+  <!-- STAGE 0: INBOX -->
+  <div id="stage-inbox" class="stage drop-shadow">
+    <h2>📥 Inbox</h2>
+
+    <div class="email-list">
+      <div class="email-row" onclick="openEmail()">
+        <strong>Google Security</strong> — Your account is locked ⚠️
+      </div>
+      <div class="email-row" onclick="openEmail()">
+        Netflix — New login detected
+      </div>
+      <div class="email-row" onclick="openEmail()">
+        RMIT IT — Maintenance notice
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 1: OPEN EMAIL -->
+  <div id="stage-email" class="stage drop-shadow hidden">
+    <h2>📧 Open Email</h2>
+
+    <div class="email-box">
+      <p><strong>From:</strong> Google Security &lt;support@googIe-security.com&gt;</p>
+      <p><strong>Subject:</strong> ⚠ Your account has been locked</p>
+      <p>
+        We detected suspicious activity on your account.
+        <strong style="color:#ef4444">Immediate action required.</strong>
+      </p>
+
+      <div class="malicious-link" onclick="startDownload()">
+        🔒 Verify Account
+      </div>
+
+      <p style="font-size:12px;opacity:0.6">
+        http://googIe-security-check.com/login
+      </p>
+    </div>
+  </div>
+
+  <!-- STAGE 2: FAKE DOWNLOAD -->
+  <div id="stage-download" class="stage drop-shadow hidden">
+    <h2 style="color:#ef4444">⚠ Downloading security update...</h2>
+    <p id="progress-text">0%</p>
+
+    <div class="progress-bar">
+      <div id="progress-fill" class="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- STAGE 3: AWARENESS -->
+  <div id="stage-awareness" class="stage drop-shadow hidden">
+    <h2 style="color:#22c55e">✔ This Was a Simulation</h2>
+    <p>You clicked a phishing link.</p>
+    <p>
+      <strong>Lesson:</strong> Always check sender domains, urgency,
+      and unexpected links.
+    </p>
+
+    <button class="btn blue" onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <!-- STAGE 4: QUIZ -->
+  <div id="stage-quiz" class="stage drop-shadow hidden">
+    <h2>🧠 Is this email legit or phishing?</h2>
+
+    <div id="question-box"></div>
+
+    <div class="quiz-actions">
+      <button class="btn red" onclick="answer('phishing')">🚫 Phishing</button>
+      <button class="btn green" onclick="answer('legit')">✔ Legit</button>
+    </div>
+
+    <p id="question-count"></p>
+  </div>
+
+  <!-- STAGE 5: RESULT -->
+  <div id="stage-result" class="stage drop-shadow hidden">
+    <h2>🎉 Training Complete</h2>
+    <p id="score-text"></p>
+
+    <button class="btn blue" onclick="location.href='lessons.html'">
+      ⬅ Return to Lessons
+    </button>
+  </div>
+
+</div>
+
+<script>
+  let progress = 0;
+  let currentQ = 0;
+  let score = 0;
+
+  const questions = [
+    {
+      correct: "phishing",
+      html: `
+        <div class="email-box">
+          <p><strong>From:</strong> Google Security &lt;support@googIe-security.com&gt;</p>
+          <p><strong>Subject:</strong> Account locked</p>
+          <p><strong style="color:#ef4444">Immediate action required</strong></p>
+          <p><a href="#">Verify account</a></p>
+          <p style="font-size:12px">http://googIe-security-check.com</p>
+        </div>`
+    },
+    {
+      correct: "legit",
+      html: `
+        <div class="email-box">
+          <p><strong>From:</strong> Google &lt;no-reply@google.com&gt;</p>
+          <p><strong>Subject:</strong> New sign-in from Windows</p>
+          <p>No action required.</p>
+          <p style="font-size:12px">https://myaccount.google.com/security</p>
+        </div>`
+    },
+    {
+      correct: "phishing",
+      html: `
+        <div class="email-box">
+          <p><strong>From:</strong> Billing &lt;billing@paypal-secure.net&gt;</p>
+          <p><strong>Subject:</strong> Invoice overdue</p>
+          <p>Attachment: Invoice_34921.pdf.exe</p>
+        </div>`
+    },
+    {
+      correct: "phishing",
+      html: `
+        <div class="email-box">
+          <p><strong>From:</strong> RMIT IT &lt;support@rmit-helpdesk.co&gt;</p>
+          <p><strong>Subject:</strong> Password expires today</p>
+          <p><a href="#">Reset password</a></p>
+          <p style="font-size:12px">http://rmit-helpdesk.co</p>
+        </div>`
+    },
+    {
+      correct: "legit",
+      html: `
+        <div class="email-box">
+          <p><strong>From:</strong> RMIT University IT &lt;no-reply@rmit.edu.au&gt;</p>
+          <p><strong>Subject:</strong> Scheduled maintenance</p>
+          <p>No action required.</p>
+        </div>`
+    }
+  ];
+
+  function openEmail() {
+    swap("stage-inbox", "stage-email");
+  }
+
+  function startDownload() {
+    swap("stage-email", "stage-download");
+    const fill = document.getElementById("progress-fill");
+    const text = document.getElementById("progress-text");
+
+    const timer = setInterval(() => {
+      progress += Math.floor(Math.random() * 8) + 5;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(timer);
+        setTimeout(() => swap("stage-download", "stage-awareness"), 800);
+      }
+      fill.style.width = progress + "%";
+      text.textContent = progress + "%";
+    }, 250);
+  }
+
+  function startQuiz() {
+    swap("stage-awareness", "stage-quiz");
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    document.getElementById("question-box").innerHTML = questions[currentQ].html;
+    document.getElementById("question-count").textContent =
+      `Question ${currentQ + 1} of ${questions.length}`;
+  }
+
+  function answer(choice) {
+    if (questions[currentQ].correct === choice) score++;
+    currentQ++;
+    if (currentQ >= questions.length) finish();
+    else renderQuestion();
+  }
+
+  function finish() {
+    swap("stage-quiz", "stage-result");
+    document.getElementById("score-text").textContent =
+      `Your score: ${score} / ${questions.length}`;
+  }
+
+  function swap(hide, show) {
+    document.getElementById(hide).classList.add("hidden");
+    document.getElementById(show).classList.remove("hidden");
+  }
+</script>
+
+</body>
+</html>
