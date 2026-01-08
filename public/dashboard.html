@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CYBERLOCK - Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <style>
+    .dashboard-box {
+      margin-top: 30px;
+      padding: 25px;
+      background: #ffffff;
+      border: 3px solid #000;
+      color: #000;
+    }
+
+    .dashboard-box h2 {
+      color: #25cdeb;
+      margin-bottom: 1rem;
+    }
+
+    .user-info p {
+      font-size: 13px;
+      margin: 4px 0;
+    }
+
+    .progress-bar {
+      height: 18px;
+      border: 3px solid #000;
+      margin: 10px 0;
+      background: #e5e7eb;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #22c55e;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .category-card {
+      border: 4px solid #000;
+      padding: 15px;
+      background: #fff;
+    }
+
+    .category-card h3 {
+      font-size: medium;
+      margin-bottom: 8px;
+      color: #000000;
+    }
+
+    .status {
+      font-size: 12px;
+      margin: 4px 0;
+    }
+
+    .status.done {
+      color: #16a34a;
+      font-weight: bold;
+    }
+
+    .status.pending {
+      color: #3f3e3e;
+    }
+
+    @media (max-width: 768px) {
+      .categories-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  
+
+  <body>
+    <div class="container dashboard">
+      <!-- NAV -->
+      <div class="nav-bar">
+        <button class="nav-tab" onclick="location.href='index.html'">
+          🏠 Home
+        </button>
+        <button
+          class="nav-tab"
+          onclick="location.href='phishing-simulation.html'"
+        >
+          📧 Simulation
+        </button>
+        <button class="nav-tab" onclick="window.location.href='lessons.html'">
+          🎯 SINGLE
+        </button>
+        <button
+          class="nav-tab"
+          onclick="window.location.href='multiplayer.html'"
+        >
+          🎮 MULTIPLAYER
+        </button>
+        <button class="nav-tab active">👤 DASHBOARD</button>
+      </div>
+      <h1>👤 USER DASHBOARD</h1>
+
+      <!-- USER INFO -->
+      <div class="dashboard-box drop-shadow">
+        <h2>👤 User Info</h2>
+        <p>NAME: <span id="username"></span></p>
+        <p>EMAIL: <span id="email"></span></p>
+        <p>JOINED: <span id="joined"></span></p>
+            
+      </div>
+      <button id="logoutBtn" class="nav-tab">🔓 Logout</button>
+
+      <!-- OVERALL PROGRESS -->
+      <div class="dashboard-box drop-shadow">
+        <h2>📊 Overall Progress</h2>
+        <div class="progress-bar">
+          <div class="progress-fill" id="overallProgress"></div>
+        </div>
+        <p id="overallText" style="font-size: 12px"></p>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div class="dashboard-box drop-shadow">
+        <h2>📚 Categories</h2>
+        <div class="categories-grid" id="categoryList"></div>
+      </div>
+       
+    </div>
+   
+
+
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>

@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>CYBERLOCK — Login</title>
+  <title>CYBERLOCK — Sign Up</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="styles.css" />
+
 
   <style>
     .auth-stage {
@@ -17,10 +18,6 @@
       max-width: 420px;
       margin-left: auto;
       margin-right: auto;
-    }
-
-    .auth-stage h2 {
-      margin-bottom: 15px;
     }
 
     .auth-input {
@@ -39,26 +36,21 @@
       font-family: inherit;
     }
 
-    .blue { background: #3b82f6; color: #fff; }
     .green { background: #22c55e; color: #fff; }
+    .blue { background: #3b82f6; color: #fff; }
 
     .auth-footer {
       margin-top: 15px;
       font-size: 14px;
     }
-
-    .auth-footer a {
-      font-weight: bold;
-      cursor: pointer;
-    }
   </style>
 </head>
-
 
 <body>
 <div class="container">
 
   <!-- NAV -->
+    <!-- NAV -->
   <div class="nav-bar">
     <button class="nav-tab" onclick="location.href='index.html'">
           🏠<br>Home
@@ -72,13 +64,20 @@
         >
           🎮<br>Multiplayer
         </button>
-    <button class="nav-tab active">🔐<br>Login</button>
-    <button class="nav-tab" onclick="location.href='signup.html'">🔐<br>Sign Up</button>
+    <button class="nav-tab" onclick="location.href='login.html'">🔐<br>Login</button>
+    <button class="nav-tab active" >🔐<br>Sign Up</button>
   </div>
 
-  <!-- LOGIN -->
+  <!-- SIGN UP -->
   <div class="auth-stage drop-shadow">
-    <h2>User Login</h2>
+    <h2>Create Account</h2>
+
+    <input
+      class="auth-input"
+      type="text"
+      id="name"
+      placeholder="Username"
+    />
 
     <input
       class="auth-input"
@@ -94,13 +93,13 @@
       placeholder="Password"
     />
 
-    <button class="btn blue" onclick="login()">ACCESS SYSTEM</button>
+    <button class="btn green" onclick="register()">CREATE USER</button>
 
     <p id="loginMessage"></p>
 
     <div class="auth-footer">
-      No account?
-      <a href="signup.html">Create one →</a>
+      Already registered?
+      <a href="login.html">Back to login →</a>
     </div>
   </div>
 
