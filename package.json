@@ -2,13 +2,13 @@
   "name": "cyberlock",
   "version": "1.0.0",
   "description": "A retro pixel-styled quiz application with single-player and multiplayer modes.",
-  "homepage": "https://github.com/Fearel/cyberlock#readme",
+  "homepage": "https://github.com/Th0ngpv/cyberlock#readme",
   "bugs": {
-    "url": "https://github.com/Fearel/cyberlock/issues"
+    "url": "https://github.com/Th0ngpv/cyberlock/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Fearel/cyberlock.git"
+    "url": "git+https://github.com/Th0ngpv/cyberlock.git"
   },
   "license": "ISC",
   "author": "",
