@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>CYBERLOCK - Dashboard</title>
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="chatbot.css" />
   </head>
   <style>
     .dashboard-box {
@@ -130,10 +131,31 @@
       </div>
        
     </div>
+    <!-- ===== Floating Chatbot ===== -->
+    <button id="chat-toggle">💬</button>
+
+    <div id="chatbot">
+      <div id="chat-header">🤖 Cyber Assistant</div>
+
+      <div id="chat-messages">
+        <div class="msg bot">👋 Hi! Ask me anything about cybersecurity.</div>
+      </div>
+
+      <div id="chat-input">
+        <input
+          id="messageInput"
+          placeholder="Type a message..."
+          onkeydown="if(event.key==='Enter') sendMessage()"
+        />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
    
 
 
 
-    <script src="dashboard.js"></script>
+    
   </body>
+  <script src="chatbot.js"></script>
+  <script src="dashboard.js"></script>
 </html>

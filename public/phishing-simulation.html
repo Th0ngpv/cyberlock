@@ -5,6 +5,7 @@
     <title>CYBERLOCK — Simulation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="chatbot.css" />
 
     <style>
       .stage {
@@ -218,16 +219,36 @@
         </button>
       </div>
     </div>
+    <!-- ===== Floating Chatbot ===== -->
+    <button id="chat-toggle">💬</button>
 
-    <script>
-      let progress = 0;
-      let currentQ = 0;
-      let score = 0;
+    <div id="chatbot">
+      <div id="chat-header">🤖 Cyber Assistant</div>
 
-      const questions = [
-        {
-          correct: "phishing",
-          html: `
+      <div id="chat-messages">
+        <div class="msg bot">👋 Hi! Ask me anything about cybersecurity.</div>
+      </div>
+
+      <div id="chat-input">
+        <input
+          id="messageInput"
+          placeholder="Type a message..."
+          onkeydown="if(event.key==='Enter') sendMessage()"
+        />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </body>
+  <script src="chatbot.js"></script>
+  <script>
+    let progress = 0;
+    let currentQ = 0;
+    let score = 0;
+
+    const questions = [
+      {
+        correct: "phishing",
+        html: `
         <div class="email-box">
           <p><strong>From:</strong> Google Security &lt;support@googIe-security.com&gt;</p>
           <p><strong>Subject:</strong> Account locked</p>
@@ -235,99 +256,98 @@
           <p><a href="#">Verify account</a></p>
           <p style="font-size:12px">http://googIe-security-check.com</p>
         </div>`,
-        },
-        {
-          correct: "legit",
-          html: `
+      },
+      {
+        correct: "legit",
+        html: `
         <div class="email-box">
           <p><strong>From:</strong> Google &lt;no-reply@google.com&gt;</p>
           <p><strong>Subject:</strong> New sign-in from Windows</p>
           <p>No action required.</p>
           <p style="font-size:12px">https://myaccount.google.com/security</p>
         </div>`,
-        },
-        {
-          correct: "phishing",
-          html: `
+      },
+      {
+        correct: "phishing",
+        html: `
         <div class="email-box">
           <p><strong>From:</strong> Billing &lt;billing@paypal-secure.net&gt;</p>
           <p><strong>Subject:</strong> Invoice overdue</p>
           <p>Attachment: Invoice_34921.pdf.exe</p>
         </div>`,
-        },
-        {
-          correct: "phishing",
-          html: `
+      },
+      {
+        correct: "phishing",
+        html: `
         <div class="email-box">
           <p><strong>From:</strong> RMIT IT &lt;support@rmit-helpdesk.co&gt;</p>
           <p><strong>Subject:</strong> Password expires today</p>
           <p><a href="#">Reset password</a></p>
           <p style="font-size:12px">http://rmit-helpdesk.co</p>
         </div>`,
-        },
-        {
-          correct: "legit",
-          html: `
+      },
+      {
+        correct: "legit",
+        html: `
         <div class="email-box">
           <p><strong>From:</strong> RMIT University IT &lt;no-reply@rmit.edu.au&gt;</p>
           <p><strong>Subject:</strong> Scheduled maintenance</p>
           <p>No action required.</p>
         </div>`,
-        },
-      ];
+      },
+    ];
 
-      function openEmail() {
-        swap("stage-inbox", "stage-email");
-      }
+    function openEmail() {
+      swap("stage-inbox", "stage-email");
+    }
 
-      function startDownload() {
-        swap("stage-email", "stage-download");
-        const fill = document.getElementById("progress-fill");
-        const text = document.getElementById("progress-text");
+    function startDownload() {
+      swap("stage-email", "stage-download");
+      const fill = document.getElementById("progress-fill");
+      const text = document.getElementById("progress-text");
 
-        const timer = setInterval(() => {
-          progress += Math.floor(Math.random() * 8) + 5;
-          if (progress >= 100) {
-            progress = 100;
-            clearInterval(timer);
-            setTimeout(() => swap("stage-download", "stage-awareness"), 800);
-          }
-          fill.style.width = progress + "%";
-          text.textContent = progress + "%";
-        }, 250);
-      }
+      const timer = setInterval(() => {
+        progress += Math.floor(Math.random() * 8) + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(timer);
+          setTimeout(() => swap("stage-download", "stage-awareness"), 800);
+        }
+        fill.style.width = progress + "%";
+        text.textContent = progress + "%";
+      }, 250);
+    }
 
-      function startQuiz() {
-        swap("stage-awareness", "stage-quiz");
-        renderQuestion();
-      }
+    function startQuiz() {
+      swap("stage-awareness", "stage-quiz");
+      renderQuestion();
+    }
 
-      function renderQuestion() {
-        document.getElementById("question-box").innerHTML =
-          questions[currentQ].html;
-        document.getElementById("question-count").textContent = `Question ${
-          currentQ + 1
-        } of ${questions.length}`;
-      }
+    function renderQuestion() {
+      document.getElementById("question-box").innerHTML =
+        questions[currentQ].html;
+      document.getElementById("question-count").textContent = `Question ${
+        currentQ + 1
+      } of ${questions.length}`;
+    }
 
-      function answer(choice) {
-        if (questions[currentQ].correct === choice) score++;
-        currentQ++;
-        if (currentQ >= questions.length) finish();
-        else renderQuestion();
-      }
+    function answer(choice) {
+      if (questions[currentQ].correct === choice) score++;
+      currentQ++;
+      if (currentQ >= questions.length) finish();
+      else renderQuestion();
+    }
 
-      function finish() {
-        swap("stage-quiz", "stage-result");
-        document.getElementById(
-          "score-text"
-        ).textContent = `Your score: ${score} / ${questions.length}`;
-      }
+    function finish() {
+      swap("stage-quiz", "stage-result");
+      document.getElementById(
+        "score-text"
+      ).textContent = `Your score: ${score} / ${questions.length}`;
+    }
 
-      function swap(hide, show) {
-        document.getElementById(hide).classList.add("hidden");
-        document.getElementById(show).classList.remove("hidden");
-      }
-    </script>
-  </body>
+    function swap(hide, show) {
+      document.getElementById(hide).classList.add("hidden");
+      document.getElementById(show).classList.remove("hidden");
+    }
+  </script>
 </html>

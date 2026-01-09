@@ -209,7 +209,6 @@ body {
   .leaderboard-list {
     max-height: 150px;
   }
-}2px -2px 0px #cccccc, inset 2px 2px 0px #ffffff;
 }
 
 .leaderboard-section h3 {
@@ -240,14 +239,15 @@ body {
 }
 
 .leaderboard-item.top-3 {
-  background: #ffeb3b;
-  border-color: #fbc02d;
+  background: #ffeb3ba6;
+  border-color: #fbc12da4;
 }
 
 .leaderboard-rank {
   font-weight: bold;
   margin-right: 10px;
   min-width: 40px;
+  color: #000000;
 }
 
 .leaderboard-name {
@@ -256,6 +256,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: #000000;
 }
 
 .leaderboard-score {

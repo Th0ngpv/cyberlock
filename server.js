@@ -9,6 +9,23 @@ const session = require('express-session');
 const crypto = require('crypto');
 const { ObjectId } = require('mongodb');
 
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+// In-memory chatbot memory (per server instance)
+const chatbotMemory = [];
+
+// Cybersecurity keyword filter
+const CHATBOT_KEYWORDS = [
+  'cyber', 'security', 'phishing', 'password', 'data', 'virus', 'malware',
+  'hack', 'privacy', 'email', 'breach', 'firewall', 'safe', 'internet',
+  'ransomware', 'attack', 'threat', 'social engineering', 'wifi', 'vpn',
+  'encryption', 'authentication', 'two-factor', 'backup', 'protection'
+];
+
 
 const MONGO_URI = process.env.MONGO_URI;
 const DB_NAME = process.env.MONGO_DB_NAME || 'questions';
@@ -402,6 +419,58 @@ app.get('/api/dashboard', async (req, res) => {
   }
 });
 
+// POST /api/chatbot
+app.post('/api/chatbot', async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ reply: 'No message provided.' });
+    }
+
+    // Keyword filtering
+    const lower = message.toLowerCase();
+    if (!CHATBOT_KEYWORDS.some(k => lower.includes(k))) {
+      return res.json({
+        reply:
+          '⚠️ I can only answer questions related to cybersecurity and online safety.'
+      });
+    }
+
+    // Save user message (keep last 6)
+    chatbotMemory.push({ role: 'user', content: message });
+    if (chatbotMemory.length > 6) chatbotMemory.shift();
+
+    const systemPrompt = `
+You are a cybersecurity awareness assistant.
+You ONLY answer questions about cybersecurity,
+online safety, or data protection.
+If unrelated, politely refuse.
+    `;
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...chatbotMemory
+      ],
+      temperature: 0.6,
+      max_tokens: 150
+    });
+
+    const reply = response.choices[0].message.content || '';
+
+    chatbotMemory.push({ role: 'assistant', content: reply });
+
+    res.json({ reply });
+
+  } catch (err) {
+    console.error('Chatbot error:', err);
+    res.json({
+      reply: '⚠️ Chatbot service is unavailable right now.'
+    });
+  }
+});
 
 
 // REPLACE THIS HARDCODED VALUE TOO
