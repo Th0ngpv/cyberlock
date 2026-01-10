@@ -241,113 +241,152 @@
   </body>
   <script src="js/chatbot.js"></script>
   <script>
-    let progress = 0;
-    let currentQ = 0;
-    let score = 0;
+  let progress = 0;
+  let currentQ = 0;
+  let score = 0;
+  let userAnswers = [];
 
-    const questions = [
-      {
-        correct: "phishing",
-        html: `
+  const questions = [
+    {
+      correct: "phishing",
+      explanation:
+        "This email uses a fake look-alike domain (googIe with a capital 'I'), creates urgency, and links to a non-Google website.",
+      html: `
+      <div class="email-box">
+        <p><strong>From:</strong> Google Security &lt;support@googIe-security.com&gt;</p>
+        <p><strong>Subject:</strong> Account locked</p>
+        <p><strong style="color:#ef4444">Immediate action required</strong></p>
+        <p><a href="#">Verify account</a></p>
+        <p style="font-size:12px">http://googIe-security-check.com</p>
+      </div>`
+    },
+    {
+      correct: "legit",
+      explanation:
+        "The sender uses an official google.com domain, the link is HTTPS, and the email does not pressure the user to act.",
+      html: `
+      <div class="email-box">
+        <p><strong>From:</strong> Google &lt;no-reply@google.com&gt;</p>
+        <p><strong>Subject:</strong> New sign-in from Windows</p>
+        <p>No action required.</p>
+        <p style="font-size:12px">https://myaccount.google.com/security</p>
+      </div>`
+    },
+    {
+      correct: "phishing",
+      explanation:
+        "The attachment ends with .pdf.exe, which disguises an executable malware file as a document.",
+      html: `
+      <div class="email-box">
+        <p><strong>From:</strong> Billing &lt;billing@paypal-secure.net&gt;</p>
+        <p><strong>Subject:</strong> Invoice overdue</p>
+        <p>Attachment: Invoice_34921.pdf.exe</p>
+      </div>`
+    },
+    {
+      correct: "phishing",
+      explanation:
+        "This email does not use an official RMIT domain (.edu.au) and asks for immediate password reset using an insecure HTTP link.",
+      html: `
+      <div class="email-box">
+        <p><strong>From:</strong> RMIT IT &lt;support@rmit-helpdesk.co&gt;</p>
+        <p><strong>Subject:</strong> Password expires today</p>
+        <p><a href="#">Reset password</a></p>
+        <p style="font-size:12px">http://rmit-helpdesk.co</p>
+      </div>`
+    },
+    {
+      correct: "legit",
+      explanation:
+        "The sender uses the official rmit.edu.au domain and the email is informational with no action required.",
+      html: `
+      <div class="email-box">
+        <p><strong>From:</strong> RMIT University IT &lt;no-reply@rmit.edu.au&gt;</p>
+        <p><strong>Subject:</strong> Scheduled maintenance</p>
+        <p>No action required.</p>
+      </div>`
+    }
+  ];
+
+  function openEmail() {
+    swap("stage-inbox", "stage-email");
+  }
+
+  function startDownload() {
+    swap("stage-email", "stage-download");
+    const fill = document.getElementById("progress-fill");
+    const text = document.getElementById("progress-text");
+
+    const timer = setInterval(() => {
+      progress += Math.floor(Math.random() * 8) + 5;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(timer);
+        setTimeout(() => swap("stage-download", "stage-awareness"), 800);
+      }
+      fill.style.width = progress + "%";
+      text.textContent = progress + "%";
+    }, 250);
+  }
+
+  function startQuiz() {
+    swap("stage-awareness", "stage-quiz");
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    document.getElementById("question-box").innerHTML =
+      questions[currentQ].html;
+
+    document.getElementById("question-count").textContent =
+      `Question ${currentQ + 1} of ${questions.length}`;
+  }
+
+  function answer(choice) {
+    userAnswers.push({
+      choice,
+      correct: questions[currentQ].correct,
+      explanation: questions[currentQ].explanation,
+      html: questions[currentQ].html
+    });
+
+    if (questions[currentQ].correct === choice) score++;
+    currentQ++;
+
+    if (currentQ >= questions.length) finish();
+    else renderQuestion();
+  }
+
+  function finish() {
+    swap("stage-quiz", "stage-result");
+
+    let resultHTML = `<p><strong>Your score:</strong> ${score} / ${questions.length}</p><hr/>`;
+
+    userAnswers.forEach((q, i) => {
+      const correct = q.choice === q.correct;
+
+      resultHTML += `
         <div class="email-box">
-          <p><strong>From:</strong> Google Security &lt;support@googIe-security.com&gt;</p>
-          <p><strong>Subject:</strong> Account locked</p>
-          <p><strong style="color:#ef4444">Immediate action required</strong></p>
-          <p><a href="#">Verify account</a></p>
-          <p style="font-size:12px">http://googIe-security-check.com</p>
-        </div>`,
-      },
-      {
-        correct: "legit",
-        html: `
-        <div class="email-box">
-          <p><strong>From:</strong> Google &lt;no-reply@google.com&gt;</p>
-          <p><strong>Subject:</strong> New sign-in from Windows</p>
-          <p>No action required.</p>
-          <p style="font-size:12px">https://myaccount.google.com/security</p>
-        </div>`,
-      },
-      {
-        correct: "phishing",
-        html: `
-        <div class="email-box">
-          <p><strong>From:</strong> Billing &lt;billing@paypal-secure.net&gt;</p>
-          <p><strong>Subject:</strong> Invoice overdue</p>
-          <p>Attachment: Invoice_34921.pdf.exe</p>
-        </div>`,
-      },
-      {
-        correct: "phishing",
-        html: `
-        <div class="email-box">
-          <p><strong>From:</strong> RMIT IT &lt;support@rmit-helpdesk.co&gt;</p>
-          <p><strong>Subject:</strong> Password expires today</p>
-          <p><a href="#">Reset password</a></p>
-          <p style="font-size:12px">http://rmit-helpdesk.co</p>
-        </div>`,
-      },
-      {
-        correct: "legit",
-        html: `
-        <div class="email-box">
-          <p><strong>From:</strong> RMIT University IT &lt;no-reply@rmit.edu.au&gt;</p>
-          <p><strong>Subject:</strong> Scheduled maintenance</p>
-          <p>No action required.</p>
-        </div>`,
-      },
-    ];
+          <h3>Question ${i + 1}</h3>
+          ${q.html}
+          <p><strong>Your answer:</strong>
+            <span style="color:${correct ? '#22c55e' : '#ef4444'}">
+              ${q.choice}
+            </span>
+          </p>
+          <p><strong>Correct answer:</strong> ${q.correct}</p>
+          <p><strong>Explanation:</strong> ${q.explanation}</p>
+        </div>
+      `;
+    });
 
-    function openEmail() {
-      swap("stage-inbox", "stage-email");
-    }
+    document.getElementById("score-text").innerHTML = resultHTML;
+  }
 
-    function startDownload() {
-      swap("stage-email", "stage-download");
-      const fill = document.getElementById("progress-fill");
-      const text = document.getElementById("progress-text");
+  function swap(hide, show) {
+    document.getElementById(hide).classList.add("hidden");
+    document.getElementById(show).classList.remove("hidden");
+  }
+</script>
 
-      const timer = setInterval(() => {
-        progress += Math.floor(Math.random() * 8) + 5;
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(timer);
-          setTimeout(() => swap("stage-download", "stage-awareness"), 800);
-        }
-        fill.style.width = progress + "%";
-        text.textContent = progress + "%";
-      }, 250);
-    }
-
-    function startQuiz() {
-      swap("stage-awareness", "stage-quiz");
-      renderQuestion();
-    }
-
-    function renderQuestion() {
-      document.getElementById("question-box").innerHTML =
-        questions[currentQ].html;
-      document.getElementById("question-count").textContent = `Question ${
-        currentQ + 1
-      } of ${questions.length}`;
-    }
-
-    function answer(choice) {
-      if (questions[currentQ].correct === choice) score++;
-      currentQ++;
-      if (currentQ >= questions.length) finish();
-      else renderQuestion();
-    }
-
-    function finish() {
-      swap("stage-quiz", "stage-result");
-      document.getElementById(
-        "score-text"
-      ).textContent = `Your score: ${score} / ${questions.length}`;
-    }
-
-    function swap(hide, show) {
-      document.getElementById(hide).classList.add("hidden");
-      document.getElementById(show).classList.remove("hidden");
-    }
-  </script>
 </html>
